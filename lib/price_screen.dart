@@ -1,5 +1,9 @@
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bitcoin/coin_data.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   const PriceScreen({Key? key}) : super(key: key);
@@ -11,7 +15,7 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
 
-  List<DropdownMenuItem<String>> menuItems() {
+  getAndroidPicker() {
     List<DropdownMenuItem<String>> items =
         []; // Create an empty list of DropdownMenuItems
     for (String currency in currenciesList) {
@@ -22,7 +26,37 @@ class _PriceScreenState extends State<PriceScreen> {
       );
       items.add(newItem); // Add them to the list
     }
-    return items;
+
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: items,
+      onChanged: (value) {
+        setState(
+          () {
+            selectedCurrency = value!;
+          },
+        );
+      },
+    );
+  }
+
+  getIOsPicker() {
+    List<Text> myItems = []; // Make an empty list of Texts
+
+    for (String currency in currenciesList) {
+      var text = Text(currency);
+      myItems.add(text);
+    }
+
+    return CupertinoPicker(
+      magnification: 1.2,
+      squeeze: 1.2,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (selectedPicker) {
+        log(selectedPicker.toString());
+      },
+      children: myItems,
+    );
   }
 
   @override
@@ -58,20 +92,15 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
           Container(
-            height: 120.0,
+            height: 130.0,
             alignment: Alignment.center,
             margin: const EdgeInsets.all(5),
             padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton<String>(
-                value: selectedCurrency,
-                items: menuItems(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedCurrency = value!;
-                  });
-                }),
-          )
+            child: Platform.isIOS
+                ? getIOsPicker()
+                : getAndroidPicker(), // The IOS is really the only platform that needs the unique picker
+          ),
         ],
       ),
     );
