@@ -6,6 +6,10 @@ import 'package:bitcoin/coin_data.dart';
 import 'package:bitcoin/recyclable_card.dart';
 import 'dart:io' show Platform;
 
+// BTC
+// ETH
+// LTE
+
 class PriceScreen extends StatefulWidget {
   const PriceScreen({Key? key}) : super(key: key);
 
@@ -14,7 +18,24 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  CoinData exchange = CoinData();
+
   String selectedCurrency = 'USD';
+  int? rate;
+
+  // Future<int> displayBTC() async {
+  //   dynamic value = await exchange.getBitcoin(selectedCurrency);
+  //   if (value != null) {
+  //     if (value == 'Bad response') {
+  //       return 0;
+  //     } else {
+  //       double result = value['rate'];
+  //       return result.toInt();
+  //     }
+  //   } else {
+  //     return 0;
+  //   }
+  // }
 
   getAndroidPicker() {
     List<DropdownMenuItem<String>> items =
@@ -61,6 +82,22 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  void getData() async {
+    CoinData coinData = CoinData();
+
+    double data = await coinData.getBitcoin('USD');
+
+    setState(() {
+      rate = data.toInt();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -77,13 +114,10 @@ class _PriceScreenState extends State<PriceScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 MyCard(
-                    selectedCurrency: selectedCurrency, bitCoinCurrency: 'BTC'),
-                const SizedBox(height: 18),
-                MyCard(
-                    selectedCurrency: selectedCurrency, bitCoinCurrency: 'ETH'),
-                const SizedBox(height: 18),
-                MyCard(
-                    selectedCurrency: selectedCurrency, bitCoinCurrency: 'LTC'),
+                  selectedCurrency: selectedCurrency,
+                  bitCoinCurrency: 'BTC',
+                  amount: rate.toString(),
+                ),
               ],
             ),
           ),

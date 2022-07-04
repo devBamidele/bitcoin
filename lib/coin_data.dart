@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 const apiKey = 'E736773C-754D-4E8B-861D-70F96C1F5604';
-const openWeatherMapUrl = 'http://api.openweathermap.org/data/2.5/weather';
+const openWeatherMapUrl = 'https://rest.coinapi.io/v1/exchangerate/';
 
 const List<String> currenciesList = [
   'AUD',
@@ -39,9 +39,12 @@ const List<String> cryptoList = [
 class CoinData {
   CoinData();
 
-  final String url = '';
+  /// Sample request
+  /// https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=E736773C-754D-4E8B-861D-70F96C1F5604
+  /// https://rest.coinapi.io/v1/exchangerate/BTC/USD?apikey=E736773C-754D-4E8B-861D-70F96C1F5604#
 
-  Future<dynamic> getCoinData() async {
+  /// Fetch the information from the server and return it as a json String
+  Future<dynamic> fetchData(String url) async {
     dynamic res;
     try {
       // Check if there's internet connectivity
@@ -59,5 +62,11 @@ class CoinData {
     } catch (e) {
       return;
     }
+  }
+
+  getBitcoin(String currency) async {
+    var url = '${openWeatherMapUrl}BTC/$currency?apikey=$apiKey';
+    dynamic data = await fetchData(url);
+    return data['rate'];
   }
 }
