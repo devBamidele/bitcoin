@@ -18,24 +18,8 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  CoinData exchange = CoinData();
-
   String selectedCurrency = 'USD';
-  int? rate;
-
-  // Future<int> displayBTC() async {
-  //   dynamic value = await exchange.getBitcoin(selectedCurrency);
-  //   if (value != null) {
-  //     if (value == 'Bad response') {
-  //       return 0;
-  //     } else {
-  //       double result = value['rate'];
-  //       return result.toInt();
-  //     }
-  //   } else {
-  //     return 0;
-  //   }
-  // }
+  int? btcrate, ethrate, ltcrate;
 
   getAndroidPicker() {
     List<DropdownMenuItem<String>> items =
@@ -56,6 +40,7 @@ class _PriceScreenState extends State<PriceScreen> {
         setState(
           () {
             selectedCurrency = value!;
+            getData();
           },
         );
       },
@@ -75,7 +60,10 @@ class _PriceScreenState extends State<PriceScreen> {
       squeeze: 1.2,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedPicker) {
-        log(selectedPicker.toString());
+        setState(() {
+          selectedCurrency = currenciesList[selectedPicker];
+          getData();
+        });
       },
       children: myItems,
     );
@@ -90,11 +78,18 @@ class _PriceScreenState extends State<PriceScreen> {
   void getData() async {
     CoinData coinData = CoinData();
 
-    double data = await coinData.getBitcoin('USD');
+    dynamic bitcoin = await coinData.getBitcoin(selectedCurrency);
 
-    setState(() {
-      rate = data.toInt();
-    });
+    if (bitcoin != null) {
+      if (bitcoin == 'Bad response') {
+        btcrate = null;
+      } else {
+        double result = bitcoin['rate'];
+        setState(() {
+          btcrate = result.toInt();
+        });
+      }
+    }
   }
 
   @override
@@ -116,7 +111,19 @@ class _PriceScreenState extends State<PriceScreen> {
                 MyCard(
                   selectedCurrency: selectedCurrency,
                   bitCoinCurrency: 'BTC',
-                  amount: rate.toString(),
+                  amount: btcrate.toString(),
+                ),
+                const SizedBox(height: 30),
+                MyCard(
+                  selectedCurrency: selectedCurrency,
+                  bitCoinCurrency: 'BTC',
+                  amount: btcrate.toString(),
+                ),
+                const SizedBox(height: 30),
+                MyCard(
+                  selectedCurrency: selectedCurrency,
+                  bitCoinCurrency: 'BTC',
+                  amount: btcrate.toString(),
                 ),
               ],
             ),
@@ -132,7 +139,7 @@ class _PriceScreenState extends State<PriceScreen> {
             padding: const EdgeInsets.only(bottom: 15),
             child: Platform.isIOS
                 ? getIOsPicker()
-                : getAndroidPicker(), // The IOS is really the only platform that needs the unique picker
+                : getIOsPicker(), // The IOS is really the only platform that needs the unique picker
           ),
         ],
       ),

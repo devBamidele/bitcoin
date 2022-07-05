@@ -29,7 +29,7 @@ class _MyCardState extends State<MyCard> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
         child: Text(
-          '1 ${widget.bitCoinCurrency} = ${widget.amount ?? '?'}  ${widget.selectedCurrency}',
+          '1 ${widget.bitCoinCurrency} = ${widget.amount == 'null' ? '?' : widget.amount}  ${widget.selectedCurrency}',
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 20.0,
