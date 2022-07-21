@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bitcoin/coin_data.dart';
@@ -15,8 +13,25 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
-  int? btcrate, ethrate, ltcrate;
-  List<int> exchange = [];
+  List<int> exchangeList = List.filled(3, 1);
+  // var lst = new List(3);
+  //<int>
+  displaySb(String message) =>
+      ScaffoldMessenger.of(context).showSnackBar(ksnackBar(message));
+
+  ksnackBar(String message) {
+    SnackBar(
+      duration: const Duration(milliseconds: 1200),
+      content: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+            fontSize: 15.0,
+            fontWeight: FontWeight.w500,
+            fontStyle: FontStyle.italic),
+      ),
+    );
+  }
 
   getAndroidPicker() {
     List<DropdownMenuItem<String>> items =
@@ -60,38 +75,48 @@ class _PriceScreenState extends State<PriceScreen> {
         setState(() {
           selectedCurrency = currenciesList[selectedPicker];
           getData();
-          log(exchange.length.toString());
         });
       },
       children: myItems,
     );
   }
 
+  showTiles() {
+    List<MyCard> myCards = [];
+    for (int i = 0; i < cryptoList.length; i++) {
+      var newItem = MyCard(
+          selectedCurrency: selectedCurrency,
+          bitCoinCurrency: cryptoList[i],
+          amount: exchangeList[i]);
+      myCards.add(newItem);
+    }
+    return myCards;
+  }
+
   @override
-  void initState() {
+  initState() {
     super.initState();
     getData();
   }
 
-  // Todo: The getData needs to receive responses and store it in an array
-  void getData() async {
+  getData() async {
     CoinData coinData = CoinData();
 
     for (int i = 0; i < cryptoList.length; i++) {
-      dynamic bitcoin = await coinData.getBitcoin(selectedCurrency);
-
+      dynamic bitcoin = await coinData.getBitcoin(
+          crypto: cryptoList[i], currency: selectedCurrency);
       if (bitcoin != null) {
         if (bitcoin == 'Bad response') {
-          btcrate = null; // This line is not necessary btw
+          setState(() {
+            exchangeList[i] = 0;
+          });
         } else {
-          double result = bitcoin['rate'];
-          exchange.add(result.toInt());
-          setState(
-            () {
-              btcrate = exchange[i];
-            },
-          );
+          setState(() {
+            exchangeList[i] = bitcoin['rate'].toInt();
+          });
         }
+      } else {
+        displaySb('No internet connection');
       }
     }
   }
@@ -101,6 +126,7 @@ class _PriceScreenState extends State<PriceScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        backgroundColor: Colors.lightBlueAccent,
         title: const Text('🤑 Coin Tracker'),
       ),
       body: Column(
@@ -115,20 +141,20 @@ class _PriceScreenState extends State<PriceScreen> {
                 // todo: Add the remaining cards and set the amount: to be arraylist[0] or so
                 MyCard(
                   selectedCurrency: selectedCurrency,
-                  bitCoinCurrency: 'BTC',
-                  amount: btcrate.toString(),
+                  bitCoinCurrency: cryptoList[0],
+                  amount: exchangeList[0],
                 ),
                 const SizedBox(height: 15),
                 MyCard(
                   selectedCurrency: selectedCurrency,
-                  bitCoinCurrency: 'BTC',
-                  amount: btcrate.toString(),
+                  bitCoinCurrency: cryptoList[1],
+                  amount: exchangeList[1],
                 ),
                 const SizedBox(height: 15),
                 MyCard(
                   selectedCurrency: selectedCurrency,
-                  bitCoinCurrency: 'BTC',
-                  amount: btcrate.toString(),
+                  bitCoinCurrency: cryptoList[2],
+                  amount: exchangeList[2],
                 ),
               ],
             ),

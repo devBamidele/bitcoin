@@ -3,6 +3,9 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// E736773C-754D-4E8B-861D-70F96C1F5604
+// A46231B5-C4CF-4466-BD7A-E57B1051451C
+
 const apiKey = 'E736773C-754D-4E8B-861D-70F96C1F5604';
 const apiKey1 = 'A46231B5-C4CF-4466-BD7A-E57B1051451C';
 const openWeatherMapUrl = 'https://rest.coinapi.io/v1/exchangerate/';
@@ -35,13 +38,11 @@ const List<String> currenciesList = [
 // Todo: Uncomment the two lines here
 const List<String> cryptoList = [
   'BTC',
-  // 'ETH',
-  // 'LTC',
+  'ETH',
+  'LTC',
 ];
 
 class CoinData {
-  CoinData();
-
   /// Fetch the information from the server and return it as a json String
   Future<dynamic> fetchData(String url) async {
     dynamic res;
@@ -53,7 +54,7 @@ class CoinData {
         String body = response.body;
 
         res = jsonDecode(body);
-        log(response.statusCode.toString());
+        log(res.toString());
       } else {
         log(response.statusCode.toString());
         res = 'Bad response';
@@ -64,9 +65,10 @@ class CoinData {
     }
   }
 
-  // todo: You need to interpolate 'BTC' to reduce DRY
-  getBitcoin(String currency) async {
-    var url = '${openWeatherMapUrl}BTC/$currency?apikey=$apiKey1';
+  getBitcoin({required String currency, required String crypto}) async {
+    var url = '$openWeatherMapUrl$crypto/$currency?apikey=$apiKey1';
     return await fetchData(url);
   }
 }
+
+// https://rest.coinapi.io/v1/exchangerate/BTC/CNY?apikey=E736773C-754D-4E8B-861D-70F96C1F5604
